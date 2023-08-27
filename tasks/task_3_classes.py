@@ -43,76 +43,43 @@ class LengthUnits:
     def from_base_units(self, value):
         return self.__class__(value / self.FACTOR)
 
-    def __add__(self, other):
+    def convert_to_base_units(self, other):
         if isinstance(other, LengthUnits):
-            result = self.to_base_units() + other.to_base_units()
-        elif isinstance(other, (int, float)):
-            result = self.to_base_units() + other
-        else:
-            raise TypeError("Unsupported operand type.")
+            return other.to_base_units()
+        if isinstance(other, (int, float)):
+            return other
+        raise TypeError("Unsupported operand type.")
+
+    def __add__(self, other):
+        result = self.to_base_units() + self.convert_to_base_units(other)
         return self.from_base_units(result)
 
     def __iadd__(self, other):
-        if isinstance(other, LengthUnits):
-            self._value += other.to_base_units()
-        elif isinstance(other, (int, float)):
-            self._value += other
-        else:
-            raise TypeError("Unsupported operand type.")
+        self._value += self.convert_to_base_units(other) / self.FACTOR
         return self
 
     def __sub__(self, other):
-        if isinstance(other, LengthUnits):
-            result = self.to_base_units() - other.to_base_units()
-        elif isinstance(other, (int, float)):
-            result = self.to_base_units() - other
-        else:
-            raise TypeError("Unsupported operand type.")
+        result = self.to_base_units() - self.convert_to_base_units(other)
         return self.from_base_units(result)
 
     def __isub__(self, other):
-        if isinstance(other, LengthUnits):
-            self._value -= other.to_base_units()
-        elif isinstance(other, (int, float)):
-            self._value -= other
-        else:
-            raise TypeError("Unsupported operand type.")
+        self._value -= self.convert_to_base_units(other) / self.FACTOR
         return self
 
     def __mul__(self, other):
-        if isinstance(other, LengthUnits):
-            result = self.to_base_units() * other.to_base_units()
-        elif isinstance(other, (int, float)):
-            result = self.to_base_units() * other
-        else:
-            raise TypeError("Unsupported operand type.")
+        result = self.to_base_units() * self.convert_to_base_units(other)
         return self.from_base_units(result)
 
     def __imul__(self, other):
-        if isinstance(other, LengthUnits):
-            self._value *= other.to_base_units()
-        elif isinstance(other, (int, float)):
-            self._value *= other
-        else:
-            raise TypeError("Unsupported operand type.")
-        return self:
+        self._value *= self.convert_to_base_units(other) / self.FACTOR
+        return self
 
     def __truediv__(self, other):
-        if isinstance(other, LengthUnits):
-            result = self.to_base_units() / other.to_base_units()
-        elif isinstance(other, (int, float)):
-            result = self.to_base_units() / other
-        else:
-            raise TypeError("Unsupported operand type.")
+        result = self.to_base_units() / self.convert_to_base_units(other)
         return self.from_base_units(result)
 
     def __itruediv__(self, other):
-        if isinstance(other, LengthUnits):
-            self._value /= other.to_base_units()
-        elif isinstance(other, (int, float)):
-            self._value /= other
-        else:
-            raise TypeError("Unsupported operand type.")
+        self._value /= self.convert_to_base_units(other) / self.FACTOR
         return self
 
     def __str__(self):
@@ -120,12 +87,12 @@ class LengthUnits:
 
     def __eq__(self, other):
         if isinstance(other, LengthUnits):
-            return self.value == other.value
+            return self.to_base_units() == other.to_base_units()
         raise TypeError("Unsupported operand type.")
 
     def __lt__(self, other):
         if isinstance(other, LengthUnits):
-            return self.value < other.value
+            return self.to_base_units() < other.to_base_units()
         raise TypeError("Unsupported operand type.")
 
 class Millimeters(LengthUnits):
@@ -172,3 +139,56 @@ class In(LengthUnits):
     UNIT = "инь"
     FACTOR = 33.3333
 
+
+# Create instances of different length units
+mm = Millimeters(100)
+cm = Centimeters(50)
+m = Meters(2)
+km = Kilometers(0.5)
+inch = Inches(10)
+feet = Feets(3)
+yard = Yards(1)
+mile = Miles(0.25)
+fen = Fen(100)
+chi = Chi(10)
+inch2 = In(20)
+
+# Basic operations between length units
+result1 = cm + mm  # Adding centimeters and millimeters
+result2 = m - km   # Subtracting meters and kilometers
+result3 = inch * 2 # Multiplying inches by 2
+result4 = yard / 2 # Dividing yards by 2
+
+# Compound operations between length units
+cm += mm       # Incrementing centimeters by millimeters
+inch -= feet  # Decrementing inches by feet
+
+# Conversion between length units
+result5 = fen.to_base_units()   # Converting fen to base units (meters)
+result6 = chi.from_base_units(3)  # Converting base units (meters) to chi
+
+# Comparison between length units
+comparison1 = m == km    # Comparing meters and kilometers (False)
+comparison2 = inch < feet  # Comparing inches and feet (True)
+
+# Printing the values of length units
+print(mm)    # Output: 100 мм
+print(cm)    # Output: 60 см
+print(m)     # Output: 2 м
+print(km)    # Output: 0.5 км
+print(inch)  # Output: -26 дюймов
+print(feet)  # Output: 3 фута
+print(yard)  # Output: 1 ярд
+print(mile)  # Output: 0.25 мили
+print(fen)   # Output: 100 фэнь
+print(chi)   # Output: 10 чи
+print(inch2) # Output: 20 инчей
+
+print(result1) # 60
+print(result2) # -498
+print(result3) # 20
+print(result4) # 0.5
+print(result5) # 0.333
+print(result6) # 9.000900090009
+print(comparison1) # False
+print(comparison2) # True
