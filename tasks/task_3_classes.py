@@ -27,72 +27,65 @@ class LengthUnits:
     BASE_UNIT = "м"
 
     def __init__(self, value):
-        self._value = value
+        self._value = value * self.FACTOR
 
     @property
     def value(self):
         return self._value
 
+    @property
+    def value_in_units(self):
+        return self._value / self.FACTOR
+
     @value.setter
     def value(self, new_value):
         self._value = new_value
 
-    def to_base_units(self):
-        return self.value * self.FACTOR
-
-    def from_base_units(self, value):
-        return self.__class__(value / self.FACTOR)
-
     def convert_to_base_units(self, other):
         if isinstance(other, LengthUnits):
-            return other.to_base_units()
+            return other.value
         if isinstance(other, (int, float)):
             return other
         raise TypeError("Unsupported operand type.")
 
     def __add__(self, other):
-        result = self.to_base_units() + self.convert_to_base_units(other)
-        return self.from_base_units(result)
+        return self.value + other.value
 
     def __iadd__(self, other):
-        self._value += self.convert_to_base_units(other) / self.FACTOR
+        self._value += other.value
         return self
 
     def __sub__(self, other):
-        result = self.to_base_units() - self.convert_to_base_units(other)
-        return self.from_base_units(result)
+        return self.value - other.value
 
     def __isub__(self, other):
-        self._value -= self.convert_to_base_units(other) / self.FACTOR
+        self._value -= other.value
         return self
 
     def __mul__(self, other):
-        result = self.to_base_units() * self.convert_to_base_units(other)
-        return self.from_base_units(result)
+        return self.value * self.convert_to_base_units(other)
 
     def __imul__(self, other):
-        self._value *= self.convert_to_base_units(other) / self.FACTOR
+        self._value *= other.value
         return self
 
     def __truediv__(self, other):
-        result = self.to_base_units() / self.convert_to_base_units(other)
-        return self.from_base_units(result)
+        return self.value / self.convert_to_base_units(other)
 
     def __itruediv__(self, other):
-        self._value /= self.convert_to_base_units(other) / self.FACTOR
-        return self
+        return self.value / other.value
 
     def __str__(self):
-        return f"{self.value} {self.UNIT}"
+        return f"{self.value_in_units} {self.UNIT}"
 
     def __eq__(self, other):
         if isinstance(other, LengthUnits):
-            return self.to_base_units() == other.to_base_units()
+            return self.value == other.value
         raise TypeError("Unsupported operand type.")
 
     def __lt__(self, other):
         if isinstance(other, LengthUnits):
-            return self.to_base_units() < other.to_base_units()
+            return self.value < other.value
         raise TypeError("Unsupported operand type.")
 
 class Millimeters(LengthUnits):
@@ -139,7 +132,6 @@ class In(LengthUnits):
     UNIT = "инь"
     FACTOR = 33.3333
 
-
 # Create instances of different length units
 mm = Millimeters(100)
 cm = Centimeters(50)
@@ -154,18 +146,14 @@ chi = Chi(10)
 inch2 = In(20)
 
 # Basic operations between length units
-result1 = cm + mm  # Adding centimeters and millimeters
-result2 = m - km   # Subtracting meters and kilometers
-result3 = inch * 2 # Multiplying inches by 2
-result4 = yard / 2 # Dividing yards by 2
+result1 = cm + mm
+result2 = m - km
+result3 = inch * 2
+result4 = yard / 2
 
 # Compound operations between length units
 cm += mm       # Incrementing centimeters by millimeters
 inch -= feet  # Decrementing inches by feet
-
-# Conversion between length units
-result5 = fen.to_base_units()   # Converting fen to base units (meters)
-result6 = chi.from_base_units(3)  # Converting base units (meters) to chi
 
 # Comparison between length units
 comparison1 = m == km    # Comparing meters and kilometers (False)
@@ -184,11 +172,9 @@ print(fen)   # Output: 100 фэнь
 print(chi)   # Output: 10 чи
 print(inch2) # Output: 20 инчей
 
-print(result1) # 60
-print(result2) # -498
-print(result3) # 20
-print(result4) # 0.5
-print(result5) # 0.333
-print(result6) # 9.000900090009
-print(comparison1) # False
-print(comparison2) # True
+print("result1 = cm + mm: ", result1, "м") # 0.6 m
+print("result2 = m - km: ", result2, "м") # -498 m
+print("result3 = inch * 2: ", result3, "м") # 0.508 m
+print("result4 = yard / 2: ", result4, "м") # 0.4572 m
+print("comparison1 = m == km: ", comparison1) # False
+print("comparison2 = inch < feet: ", comparison2) # True
