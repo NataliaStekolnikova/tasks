@@ -73,7 +73,8 @@ class LengthUnits:
         return self.value / self.convert_to_base_units(other)
 
     def __itruediv__(self, other):
-        return self.value / other.value
+        self._value /= other.value
+        return self
 
     def __str__(self):
         return f"{self.value_in_units} {self.UNIT}"
