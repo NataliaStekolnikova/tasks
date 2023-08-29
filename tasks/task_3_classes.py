@@ -49,28 +49,36 @@ class LengthUnits:
         raise TypeError("Unsupported operand type.")
 
     def __add__(self, other):
-        return self.value + other.value
+        result = self.__class__(self.value)
+        result.value = self.value + self.convert_to_base_units(other)
+        return result
 
     def __iadd__(self, other):
         self._value += other.value
         return self
 
     def __sub__(self, other):
-        return self.value - other.value
+        result = self.__class__(self.value)
+        result.value = self.value - self.convert_to_base_units(other)
+        return result
 
     def __isub__(self, other):
         self._value -= other.value
         return self
 
     def __mul__(self, other):
-        return self.value * self.convert_to_base_units(other)
+        result = self.__class__(self.value)
+        result.value = self.value * self.convert_to_base_units(other)
+        return result
 
     def __imul__(self, other):
         self._value *= other.value
         return self
 
     def __truediv__(self, other):
-        return self.value / self.convert_to_base_units(other)
+        result = self.__class__(self.value)
+        result.value = self.value / self.convert_to_base_units(other)
+        return result
 
     def __itruediv__(self, other):
         self._value /= other.value
@@ -173,9 +181,9 @@ print(fen)   # Output: 100 фэнь
 print(chi)   # Output: 10 чи
 print(inch2) # Output: 20 инчей
 
-print("result1 = cm + mm: ", result1, "м") # 0.6 m
-print("result2 = m - km: ", result2, "м") # -498 m
-print("result3 = inch * 2: ", result3, "м") # 0.508 m
-print("result4 = yard / 2: ", result4, "м") # 0.4572 m
+print("result1 = cm + mm: ", result1) # 60 см
+print("result2 = m - km: ", result2) # -498 m
+print("result3 = inch * 2: ", result3) # 20 дюймов
+print("result4 = yard / 2: ", result4) # 0.5 ярдов
 print("comparison1 = m == km: ", comparison1) # False
 print("comparison2 = inch < feet: ", comparison2) # True
