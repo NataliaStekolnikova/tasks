@@ -23,65 +23,61 @@
 # реализуется в базовом классе. Иерархию наследования можно сделать двухуровневой, задача подходит
 # для этого.
 
+from numbers import Number
+
 class LengthUnits:
     BASE_UNIT = "м"
 
     def __init__(self, value):
-        self._value = value * self.FACTOR
-
-    @property
-    def value(self):
-        return self._value
+        self.__value = value * self.FACTOR
 
     @property
     def value_in_units(self):
-        return self._value / self.FACTOR
+        return self.__value / self.FACTOR
 
-    @value.setter
-    def value(self, new_value):
-        self._value = new_value
-
-    def convert_to_base_units(self, other):
+    def __convert_to_base_units(self, other):
         if isinstance(other, LengthUnits):
-            return other.value
-        if isinstance(other, (int, float)):
+            return other.__value
+        if isinstance(other, Number):
             return other
         raise TypeError("Unsupported operand type.")
 
     def __add__(self, other):
-        result = self.__class__(self.value)
-        result.value = self.value + self.convert_to_base_units(other)
+        result = self.__class__(self.__value)
+        result.__value = self.__value + self.__convert_to_base_units(other)
         return result
 
     def __iadd__(self, other):
-        self._value += other.value
-        return self
+        if isinstance(other, LengthUnits):
+            self.__value += other.__value
+            return self
+        raise TypeError("Unsupported operand type.")
 
     def __sub__(self, other):
-        result = self.__class__(self.value)
-        result.value = self.value - self.convert_to_base_units(other)
+        result = self.__class__(self.__value)
+        result.__value = self.__value - self.__convert_to_base_units(other)
         return result
 
     def __isub__(self, other):
-        self._value -= other.value
+        self.__value -= other.__value
         return self
 
     def __mul__(self, other):
-        result = self.__class__(self.value)
-        result.value = self.value * self.convert_to_base_units(other)
+        result = self.__class__(self.__value)
+        result.__value = self.__value * self.__convert_to_base_units(other)
         return result
 
     def __imul__(self, other):
-        self._value *= other.value
+        self.__value *= other.__value
         return self
 
     def __truediv__(self, other):
-        result = self.__class__(self.value)
-        result.value = self.value / self.convert_to_base_units(other)
+        result = self.__class__(self.__value)
+        result.__value = self.__value / self.__convert_to_base_units(other)
         return result
 
     def __itruediv__(self, other):
-        self._value /= other.value
+        self.__value /= other.__value
         return self
 
     def __str__(self):
@@ -89,12 +85,17 @@ class LengthUnits:
 
     def __eq__(self, other):
         if isinstance(other, LengthUnits):
-            return self.value == other.value
+            return self.__value == other.__value
         raise TypeError("Unsupported operand type.")
 
     def __lt__(self, other):
         if isinstance(other, LengthUnits):
-            return self.value < other.value
+            return self.__value < other.__value
+        raise TypeError("Unsupported operand type.")
+
+    def __gt__(self, other):
+        if isinstance(other, LengthUnits):
+            return self.__value > other.__value
         raise TypeError("Unsupported operand type.")
 
 class Millimeters(LengthUnits):
