@@ -48,10 +48,8 @@ class LengthUnits:
         return result
 
     def __iadd__(self, other):
-        if isinstance(other, LengthUnits):
-            self.__value += other.__value
-            return self
-        raise TypeError("Unsupported operand type.")
+        self.__value += self.__convert_to_base_units(other)
+        return self
 
     def __sub__(self, other):
         result = self.__class__(self.__value)
@@ -59,17 +57,21 @@ class LengthUnits:
         return result
 
     def __isub__(self, other):
-        self.__value -= other.__value
+        self.__value += self.__convert_to_base_units(other)
         return self
 
     def __mul__(self, other):
-        result = self.__class__(self.__value)
-        result.__value = self.__value * self.__convert_to_base_units(other)
-        return result
+        if isinstance(other, Number):
+            result = self.__class__(self.__value)
+            result.__value = self.__value * other
+            return result
+        raise TypeError("Unsupported operand type.")
 
     def __imul__(self, other):
-        self.__value *= other.__value
-        return self
+        if isinstance(other, Number):
+            self.__value *= other
+            return self
+        raise TypeError("Unsupported operand type.")
 
     def __truediv__(self, other):
         result = self.__class__(self.__value)
@@ -77,8 +79,10 @@ class LengthUnits:
         return result
 
     def __itruediv__(self, other):
-        self.__value /= other.__value
-        return self
+        if isinstance(other, Number):
+            self.__value /= other
+            return self
+        raise TypeError("Unsupported operand type.")
 
     def __str__(self):
         return f"{self.value_in_units} {self.UNIT}"
