@@ -1,23 +1,8 @@
-# Домашняя задача:
-# Даны: три стороны треугольника. Требуется: проверить, действительно ли это стороны треугольника.
-# Если стороны определяют треугольник, найти его площадь. Если нет, вывести сообщение о неверных данных.
-from math import sqrt
-a = float(input("Введите длину первой стороны треугольника: "))
-b = float(input("Введите длину второй стороны треугольника: "))
-c = float(input("Введите длину третьей стороны треугольника: "))
-if a <= 0 or b <= 0 or c <= 0:
-   print("Ошибка: длина стороны не может быть меньше или равна нулю")
-elif a + b <= c or a + c <= b or b + c <= a:
-   print("Ошибка: заданные стороны не могут образовать треугольник")
-else:
-   p = (a + b + c) / 2
-   S = sqrt(p * (p - a) * (p - b) * (p - c))
-   print("Площадь треугольника равна:", S)
-
 # Задание 2. Коллекции.
 # Примечание: входные параметры ни в однй из задач не должны быть модифицированы.
 # '''
 from typing import Any, Dict, Iterable, List, Tuple
+import copy
 # Сконструировать и вернуть список из переданных аргументов.
 def build_list_from_args(*args) -> List:
     return list(args)
@@ -52,8 +37,11 @@ def build_list_from_value_and_length(value: Any, length: int) -> List:
 
 # Удалить из списка заданный элемент.
 def remove_value_from_list(values: List, value_to_remove: Any) -> List:
-    values.remove(value_to_remove) # но эта команда имеет ограничение, она удалит только один, первый из повторяющихся элементов, предназначенных для удаления
-    return values
+    new_list = []
+    for value in values:
+        if value != value_to_remove:
+            new_list.append(value)
+    return new_list
 
 # Удалить из списка заданный элемент, используя comprehension expression [... for .. in ...].
 def remove_value_from_list_using_comprehension(values: List, value_to_remove: Any) -> List:
@@ -86,11 +74,7 @@ def remove_duplicates_from_list(values: List) -> List:
 
 # Создать и вернуть словарь из заданного набора именованных аргументов, значения которых имеют тип int.
 def build_dict_from_named_arguments_of_type_int(**kwargs) -> Dict:
-    result_dict = {}
-    for key, value in kwargs.items():
-        if isinstance(value, int):
-            result_dict[key] = value
-    return result_dict
+    return {key: value for key, value in kwargs.items() if isinstance(value, int)}
 
 # Создать и вернуть словарь, используя в качестве ключей аргумент функции,
 # а в качестве значений - None (dict.fromkeys).
@@ -100,7 +84,10 @@ def build_dict_from_keys(values: Iterable) -> Dict:
 # Создать и вернуть словарь, используя в качестве ключей аргумент функции,
 # а в качестве значений - значение по-умолчанию.
 def build_dict_from_keys_and_default(values: Iterable, default: Any) -> Dict:
-    return dict.fromkeys(values, default)
+    result_dict = {}
+    for key in values:
+        result_dict[key] = copy.deepcopy(default)
+    return result_dict
 
 # Создать и вернуть словарь, ключами которого являются индексы элементов,
 # а значениями - значения элементов iterable параметров (использовать enumerate и dict comprehension).
@@ -177,10 +164,6 @@ def deep_merge_two_dicts(first: Dict, second: Dict) -> Dict:
         else:
             merged_dict[key] = value
     return merged_dict
-# dict1 = {'a': {'x': 1, 'y': 2}, 'b': [3, 4]}
-# dict2 = {'a': {'y': 3, 'z': 4}, 'b': [5, 6], 'c': {7, 8}}
-# merged_dict = deep_merge_two_dicts(dict1, dict2)
-# print(merged_dict) # {'a': {'x': 1, 'y': [2, 3], 'z': 4}, 'b': [3, 4, 5, 6], 'c': {8, 7}}
 
 # Вернуть список, состоящий из ключей, принадлежащих словарю.
 def get_keys(dictionary: Dict) -> List:
@@ -221,9 +204,6 @@ def swap_dict_keys_and_values(dictionary: Dict) -> Dict:
         else:
             reversed_dict[key] = value
     return reversed_dict
-# my_dict = {'a': 1, 'b': 2.5, 'c': 'hello', 'd': (1, 2, 3), 'e': [4, 5, 6], 'f': {'x': 7, 'y': 8}}
-# result = swap_dict_keys_and_values(my_dict)
-# print(result)
 
 # Вернуть словарь, отсортированный по ключу. Ключи могут иметь только тип int.
 def sort_dict_with_int_keys(dictionary):
@@ -250,21 +230,15 @@ def group_dict_elements_by_key_type(dictionary: Dict) -> Dict:
     for key in grouped_dict:
         grouped_dict[key].sort(key=lambda x: x[0], reverse=True)
     return grouped_dict
-# my_dict = {2.5: 'a', 'x': 1, 1.5: 'b', 1: 'c', -2: 'b', 'y': -2, 'z': 3}
-# result = group_dict_elements_by_key_type(my_dict)
-# print(result)
 
 # Подсчитать количество элементов словаря, имеющих числовой тип, значение которых находится
 # в интервале [-10, 25].
-def count_dict_elements(dictionary: Dict) -> Dict:
-    int_count = 0
-    float_count = 0
-    for key, value in dictionary.items():
-        if isinstance(value, (int)) and -10 <= value <= 25:
-            int_count += 1
-        elif isinstance(value, (float)) and -10 <= value <= 25:
-            float_count += 1
-    return {"int": int_count, "float": float_count}
+def count_dict_elements(dictionary: Dict) -> int:
+    num_count = 0
+    for value in dictionary.values():
+        if isinstance(value, (int, float)) and -10 <= value <= 25:
+            num_count += 1
+    return num_count
 
 # Построить и возвратить словарь из двух списков. Количество ключей может превышать
 # количество значений. В этом случае (для ключей, оставшихся без соответствующей пары)
@@ -284,11 +258,7 @@ def build_dict_from_two_unaligned_lists(keys: List, values: List) -> Dict:
 # в качестве значений использовать значение, заданное по-умолчанию.
 def build_dict_from_two_unaligned_lists_and_default(keys: List, values: List, default: Any) -> Dict:
     result_dict = {}
-    for index, key in enumerate(keys):
-        if index < len(values):
-            value = values[index]
-        else:
-            value = default
+    for key, value in zip(keys, copy.copy(values)):
         result_dict[key] = value
     return result_dict
 
